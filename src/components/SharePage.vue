@@ -17,6 +17,7 @@
             ({{ file.size | size }})
           </li>
         </ul>
+        <p class="tip">click the file name to copy the link</p>
       </div>
     </div>
   </div>
@@ -212,5 +213,10 @@ export default {
   .share-page.loading li:active {
     cursor: text;
     outline: none;
+  }
+
+  .tip {
+    color: #888;
+    margin-top: 1em;
   }
 </style>
