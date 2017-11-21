@@ -1,6 +1,11 @@
 {
-  "localStorage": {
-    "serverKey": "sfs-links"
+  "firebase": {
+    "apiKey": "AIzaSyBHsb4fmCGupwqcdz5bdDnOpSNLpHwWvLw",
+    "authDomain": "webrtc-sfs.firebaseapp.com",
+    "databaseURL": "https://webrtc-sfs.firebaseio.com",
+    "projectId": "webrtc-sfs",
+    "storageBucket": "",
+    "messagingSenderId": "685746255008"
   },
   "peerjs": {
     "key": "zcn86e7y7xkr19k9"

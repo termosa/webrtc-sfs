@@ -58,7 +58,7 @@ export default {
   },
   mounted () {
     server.find(this.fileId)
-      .then(([ link ]) => createPeer(link.peerId))
+      .then(link => createPeer(link.peerId))
       .then(peer => {
         this.peer = peer
         this.peer.on('data', this.receiveData.bind(this))
@@ -66,6 +66,7 @@ export default {
       .catch(error => {
         this.failed = true
         this.error = error.toString()
+        log.error('failed file load', error)
       })
       .then(() => { this.loading = false })
   }

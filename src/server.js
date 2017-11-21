@@ -1,61 +1,29 @@
 import log from '@/log'
 import config from '@/../app-config'
+import firebase from 'firebase'
 
-const { serverKey } = config.localStorage
+firebase.initializeApp(config.firebase)
+const linksDb = firebase.database().ref().child('links')
 
-const loadLinks = () => {
-  const links = localStorage.getItem(serverKey)
-  return links ? JSON.parse(links) : []
-}
-const storeLinks = links => localStorage.setItem(serverKey, JSON.stringify(links))
-
-const matchLink = (link, filter) => {
-  return !Object.keys(filter).find(prop => {
-    return filter[prop] !== link[prop]
-  })
-}
-
-const storage = {
-  add: link => {
-    const links = loadLinks()
-    storeLinks(links.concat(link))
-    log('[storage] the link is stored', link)
-    return true
-  },
-  remove (filter) {
-    const links = loadLinks()
-    const linkToRemove = links.find(link => matchLink(link, filter))
-    if (linkToRemove) {
-      log('[storage] the link is removed', linkToRemove)
-      return true
-    } else {
-      log('[storage] no link to remove', filter)
-      return false
-    }
-  },
-  find (filter = {}) {
-    return loadLinks().filter(link => matchLink(link, filter))
-  }
-}
-
-const generateTimeout = () => Math.random() * 1500 + 500
 const createLink = id => `${document.location.origin}/file/${id}`
 
 const share = (peerId, id, type = 'file') => {
   return new Promise((resolve, reject) => {
-    const link = createLink(id)
-    storage.add({ peerId, id, type })
-    setTimeout(() => resolve(link), generateTimeout())
+    const link = { peerId, id, type }
+    linksDb.child(id).set(link)
+    log(`[storage] the link is stored`, link)
+    const url = createLink(id)
+    resolve(url)
   })
 }
 
 const find = id => {
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const link = storage.find({ id })
+    linksDb.child(id).on('value', snapshot => {
+      const link = snapshot.val()
       if (link) resolve(link)
-      else reject(new Error('not found'))
-    }, generateTimeout())
+      else reject(new Error(`${id} not found in db`))
+    })
   })
 }
 
