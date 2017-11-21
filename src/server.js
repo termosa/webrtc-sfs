@@ -5,7 +5,12 @@ import firebase from 'firebase'
 firebase.initializeApp(config.firebase)
 const linksDb = firebase.database().ref().child('links')
 
-const createLink = id => `${document.location.origin}/file/${id}`
+const createLink = id => {
+  const origin = location.hash
+    ? location.href.slice(0, 0 - location.hash.length)
+    : location.href
+  return `${origin}/#/file/${id}`
+}
 
 const share = (peerId, id, type = 'file') => {
   return new Promise((resolve, reject) => {
