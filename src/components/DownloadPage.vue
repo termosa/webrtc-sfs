@@ -1,10 +1,9 @@
 <template>
   <div class="file-page" :class="{ failed, loading }">
     <div class="content">
-      <p><strong>{{ fileId }}</strong></p>
       <p v-if="loading">loading...</p>
       <div v-if="!loading">
-        <input v-if="!failed" type="button" @click="downloadFile" value="download" />
+        <input v-if="!failed" type="button" @click="downloadFile" value="download file" />
         <p v-if="failed">{{ error }}</p>
       </div>
     </div>
@@ -13,7 +12,6 @@
 
 <script>
 import log from '@/log'
-import server from '@/server'
 import download from '@/download'
 import { createPeer } from '@/client-peer'
 
@@ -21,12 +19,14 @@ export default {
   name: 'FilePage',
   data: () => ({
     peer: null,
-    link: null,
     loading: true,
     failed: false,
     error: null
   }),
   computed: {
+    peerId () {
+      return this.$route.params.peer
+    },
     fileId () {
       return this.$route.params.file
     }
@@ -57,16 +57,10 @@ export default {
     }
   },
   mounted () {
-    server.find(this.fileId)
-      .then(link => createPeer(link.peerId))
+    createPeer(this.peerId)
       .then(peer => {
         this.peer = peer
         this.peer.on('data', this.receiveData.bind(this))
-      })
-      .catch(error => {
-        this.failed = true
-        this.error = error.toString()
-        log.error('failed file load', error)
       })
       .then(() => { this.loading = false })
   }

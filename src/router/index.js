@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import SharePage from '@/components/SharePage'
-import FilePage from '@/components/FilePage'
+import DownloadPage from '@/components/DownloadPage'
 
 Vue.use(Router)
 
@@ -13,9 +13,9 @@ export default new Router({
       component: SharePage
     },
     {
-      path: '/file/:file',
-      name: 'FilePage',
-      component: FilePage
+      path: '/file/:peer/:file',
+      name: 'DownloadPage',
+      component: DownloadPage
     }
   ]
 })

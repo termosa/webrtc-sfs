@@ -26,11 +26,17 @@
 <script>
 import { createPeer } from '@/host-peer'
 import log from '@/log'
-import server from '@/server'
 import copy from '@/copy'
 import qinu from 'qinu'
 
 const generateId = () => qinu({ length: 32 })
+
+const createLink = (peerId, fileId) => {
+  const origin = location.hash
+    ? location.href.slice(0, 0 - location.hash.length)
+    : location.href
+  return `${origin}#/file/${peerId}/${fileId}`
+}
 
 export default {
   name: 'SharePage',
@@ -64,12 +70,8 @@ export default {
       if (this.peer) this.shareFile(newFile)
     },
     shareFile (file) {
-      server.share(this.peer.id, file.id).then(
-        link => {
-          file.link = link
-          log(`link for ${file.name}: ${link}`)
-        }
-      )
+      file.link = createLink(this.peer.id, file.id)
+      log(`link for ${file.name}: ${file.link}`)
     },
     sendFile (connection, file) {
       const name = file.name
