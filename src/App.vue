@@ -29,6 +29,10 @@ html, body, #app {
   min-height: 320px;
 }
 
+a {
+  color: #2c3e50;
+}
+
 .page {
   height: 100%;
   overflow: auto;

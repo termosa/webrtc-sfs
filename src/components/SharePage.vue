@@ -2,9 +2,10 @@
   <div class="share-page" @drop.prevent="onDrop" @dragover.prevent :class="{ failed, loading }">
     <div class="content">
       <div class="placeholder" v-if="!files.length">
-        <p>
+        <p>Here you can share files with anybody by peer-to-peer connection using modern WebRTC technology. It means that you won't download your files to any server, people who you share files with will download them directly from your browser (it is more <strong>fast</strong> and <strong>secure</strong> way to share files).</p>
+        <p class="call-to-action">
           drop files here,<br>or
-          <label>
+          <label class="select-files">
             choose them
             <input type="file" name="files" multiple @change="onSelectFile">
           </label>
@@ -12,12 +13,24 @@
       </div>
       <div class="list" v-if="files.length">
         <ul>
-          <li v-for="file in files" @click="copyLink(file)" tabindex="0">
-            {{ file.name }}
-            ({{ file.size | size }})
+          <li v-for="file in files">
+            <a :href="file.link" target="_blank"
+              :class="['file', { copied: file.link === copiedLink }]"
+              @click="copyLink($event, file)"
+              @keydown.enter="copyLink($event, file)"
+              @keydown.space="copyLink($event, file)">
+              {{ file.name }}
+              ({{ file.size | size }})
+            </a>
           </li>
         </ul>
-        <p class="tip">click the file name to copy the link</p>
+        <p class="tip">
+          click the file name to copy the link or
+          <label class="select-files">
+            add more
+            <input type="file" name="files" multiple @change="onSelectFile">
+          </label>
+        </p>
       </div>
     </div>
   </div>
@@ -44,6 +57,7 @@ export default {
     peer: null,
     failed: false,
     loading: true,
+    copiedLink: null,
     files: window.files || (window.files = []) // to keep files while Vue is updating
   }),
   methods: {
@@ -82,10 +96,13 @@ export default {
         file: { blob, name, type }
       })
     },
-    copyLink (file) {
+    copyLink (event, file) {
       if (file.link) {
         log(`copying link for ${file.name}: ${file.link}`)
-        copy(file.link)
+        if (copy(file.link)) {
+          event.preventDefault()
+          this.copiedLink = file.link
+        }
       } else {
         log.error(`link is not ready for ${file.name}`)
       }
@@ -179,21 +196,29 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3em;
-    color: #aeb9c2;
+    flex-direction: column;
   }
 
-  .placeholder label {
+  .select-files {
     text-decoration: underline;
     cursor: pointer;
   }
 
-  .placeholder label:hover {
+  .select-files:hover {
     text-decoration: none;
   }
 
-  .placeholder input {
+  .select-files input {
     display: none;
+  }
+
+  .placeholder p {
+    max-width: 600px;
+  }
+
+  .call-to-action {
+    font-size: 2em;
+    color: #aeb9c2;
   }
 
   ul {
@@ -202,17 +227,26 @@ export default {
     padding: 0;
   }
 
-  li {
+  .file {
     cursor: grab;
     margin: .5em;
+    text-decoration: none;
   }
 
-  li:active {
+  .file:hover {
+    text-decoration: underline;
+  }
+
+  .file:active {
     cursor: grabbing;
   }
 
-  .share-page.loading li,
-  .share-page.loading li:active {
+  .file.copied:before {
+    content: '[copied]';
+  }
+
+  .share-page.loading .file,
+  .share-page.loading .file:active {
     cursor: text;
     outline: none;
   }

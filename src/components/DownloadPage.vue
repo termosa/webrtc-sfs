@@ -4,6 +4,8 @@
       <p v-if="loading">loading...</p>
       <div v-if="!loading">
         <input v-if="!failed" type="button" @click="downloadFile" value="download file" />
+        <p v-if="!failed" class="tip">you are here because somebody wants to share file with you</p>
+        <p v-if="!failed" class="tip">if you want, you can <router-link to="/">share files</router-link> too</p>
         <p v-if="failed">{{ error }}</p>
       </div>
     </div>
@@ -81,5 +83,14 @@ export default {
   .file-page.failed {
     background-color: #ffe4e4;
     color: #ec9494;
+  }
+
+  .tip {
+    color: #888;
+    margin-top: 1em;
+  }
+
+  .tip a {
+    color: #888;
   }
 </style>
