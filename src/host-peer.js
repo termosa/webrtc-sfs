@@ -29,7 +29,10 @@ export const createPeer = () => {
   }
 
   return new Promise((resolve, reject) => {
-    const peer = new Peer({ key: config.peerjs.key })
+    const peer = new Peer({
+      key: config.peerjs.key,
+      secure: true
+    })
 
     peer.on('open', id => {
       log(`peer initialized with id: ${id}`)
